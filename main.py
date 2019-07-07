@@ -48,4 +48,8 @@ if __name__ == "__main__":
     args = setup_args()
     Cls = site2cls[args.site]
     session = Cls(args.user, args.proj)
-    session.write_json(args.file, args.only)
+
+    if args.action == "backup":
+        session.write_json(args.file, args.only)
+    elif args.action == "upload":
+        session.apply_json(args.file, args.only)

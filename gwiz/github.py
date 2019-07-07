@@ -1,5 +1,6 @@
 # github.py
 
+import json
 import requests
 
 from gwiz.issue import Issue, Comment
@@ -48,3 +49,13 @@ class Github(session.Session):
                 Comment(item['user']['login'], item['body'])
             )
         return comments
+
+    def _apply_label(self, label):
+        """Upload a label to the web"""
+        data = {
+            "name" : label.title,
+            "description" : label.desc,
+            "color" : label.color
+        }
+        resp = self._session.post(self._base + "/labels", data=json.dumps(data))
+        print(resp.text)

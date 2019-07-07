@@ -13,3 +13,11 @@ class Label:
             "color" : self.color,
             "desc" : self.desc
         }
+
+    @staticmethod
+    def json_to_labels(data):
+        """Convert json structure to Labels"""
+        labels = []
+        for item in data:
+            labels.append(Label(item['title'], item['color'], item['desc']))
+        return labels
