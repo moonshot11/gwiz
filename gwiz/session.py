@@ -7,9 +7,13 @@ from abc import ABC, abstractmethod as absmth
 class Session():
     """A generic web session"""
 
-    def write_labels(self, filename):
+    def write_json(self, filename, only=None):
         """Write labels to filename"""
-        labels = self._get_labels()
-        data = [lbl.as_dict for lbl in labels]
+        data = dict()
+        if only is None or only == "labels":
+            labels = [lbl.as_dict for lbl in self._get_labels()]
+            data["labels"] = labels
+        if only is None or only == "issues":
+            pass
         with open(filename, "w") as fout:
             json.dump(data, fout)
