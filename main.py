@@ -25,6 +25,7 @@ def setup_args():
         sub.add_argument("--site", "-s", required=True, choices=["github", "gitlab"])
         sub.add_argument("--user", "-u", required=True)
         sub.add_argument("--proj", "-p", required=True)
+        sub.add_argument("--type", "-t", required=True, choices=["labels", "issues"])
 
     args = parser.parse_args()
 
@@ -36,4 +37,4 @@ if __name__ == "__main__":
     args = setup_args()
     Cls = site2cls[args.site]
     session = Cls(args.user, args.proj)
-    session.get_labels()
+    session.write_labels(args.file)

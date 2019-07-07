@@ -2,6 +2,7 @@
 
 import requests
 
+from gwiz.label import Label
 from gwiz import session
 
 class Github(session.Session):
@@ -14,7 +15,14 @@ class Github(session.Session):
         self._session.headers.update(auth_hdr)
         self._base = "https://api.github.com/repos/{}/{}".format(user, proj)
 
-    def get_labels(self):
+    def _get_labels(self):
         """Return labels"""
-        response = self._session.get(self._base + "/labels")
-        print(response.text)
+        # Returns list of labels in json
+        data = self._session.get(self._base + "/labels").json()
+        labels = []
+        for lbl in data:
+            labels.append(
+                Label(lbl['name'], lbl['color'], lbl.get("description", ""))
+            )
+        return labels
+
