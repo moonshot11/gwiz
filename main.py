@@ -4,7 +4,11 @@ import argparse
 import json
 import requests
 
+from gwiz import github
+from gwiz import gitlab
 from gwiz import log
+
+site2cls = {"github" : github.Github, "gitlab" : gitlab.Gitlab}
 
 def setup_args():
     parser = argparse.ArgumentParser()
@@ -16,9 +20,11 @@ def setup_args():
     sub_clrlabels = subs.add_parser("clear_labels", help="Clear labels on site")
 
     for sub in (sub_upload, sub_export):
-        sub.add_argument("--file", required=True)
+        sub.add_argument("--file", "-f", required=True)
     for sub in (sub_upload, sub_export, sub_clrlabels):
-        sub.add_argument("--site", required=True, choices=["github", "gitlab"])
+        sub.add_argument("--site", "-s", required=True, choices=["github", "gitlab"])
+        sub.add_argument("--user", "-u", required=True)
+        sub.add_argument("--proj", "-p", required=True)
 
     args = parser.parse_args()
 
@@ -28,4 +34,6 @@ def setup_args():
 
 if __name__ == "__main__":
     args = setup_args()
-    print(args.action)
+    Cls = site2cls[args.site]
+    session = Cls(args.user, args.proj)
+    session.get_labels()
