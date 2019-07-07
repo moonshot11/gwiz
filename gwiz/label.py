@@ -7,7 +7,6 @@ class Label:
         self.color = color
         self.desc = desc
 
-    @property
     def as_dict(self):
         return {
             "title" : self.title,

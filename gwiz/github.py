@@ -2,6 +2,7 @@
 
 import requests
 
+from gwiz.issue import Issue, Comment
 from gwiz.label import Label
 from gwiz import session
 
@@ -26,3 +27,24 @@ class Github(session.Session):
             )
         return labels
 
+    def _get_issues(self, comments=True):
+        """Returns issues"""
+        data = self._session.get(self._base + "/issues").json()
+        issues = []
+        for item in data:
+            issue = Issue(item['title'], item['body'], item['labels'])
+            if item['comments'] > 0:
+                issue._comments = self._get_comments(item['number'])
+            issues.append(issue)
+        return issues
+
+    def _get_comments(self, issue_id):
+        """Returns comments from issue"""
+        data = self._session.get(self._base + "/issues/{}/comments".format(issue_id))
+        data = data.json()
+        comments = []
+        for item in data:
+            comments.append(
+                Comment(item['user']['login'], item['body'])
+            )
+        return comments

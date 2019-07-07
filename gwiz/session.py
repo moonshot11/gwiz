@@ -11,9 +11,10 @@ class Session():
         """Write labels to filename"""
         data = dict()
         if only is None or only == "labels":
-            labels = [lbl.as_dict for lbl in self._get_labels()]
+            labels = [lbl.as_dict() for lbl in self._get_labels()]
             data["labels"] = labels
         if only is None or only == "issues":
-            pass
+            issues = [iss.as_dict() for iss in self._get_issues()]
+            data["issues"] = issues
         with open(filename, "w") as fout:
             json.dump(data, fout)
