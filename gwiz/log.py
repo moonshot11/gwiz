@@ -8,3 +8,6 @@ def info(msg):
 def error(msg, code=1):
     print("-E- {}".format(msg))
     sys.exit(code)
+
+def resp(msg):
+    print("-R- " + msg)

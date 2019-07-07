@@ -28,3 +28,8 @@ class Session():
 
         for label in Label.json_to_labels(data["labels"]):
             self._apply_label(label)
+
+    def delete_all(self, only):
+        """Delete all labels"""
+        if only is None or only == "labels":
+            self._delete_all_labels()

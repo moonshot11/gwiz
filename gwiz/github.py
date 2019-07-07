@@ -5,6 +5,7 @@ import requests
 
 from gwiz.issue import Issue, Comment
 from gwiz.label import Label
+from gwiz import log
 from gwiz import session
 
 class Github(session.Session):
@@ -59,3 +60,16 @@ class Github(session.Session):
         }
         resp = self._session.post(self._base + "/labels", data=json.dumps(data))
         print(resp.text)
+
+    def _delete_all_labels(self):
+        """Delete all labels"""
+        data = self._session.get(self._base + "/labels").json()
+        if not data:
+            log.info("No labels found!")
+        for item in data:
+            resp = self._session.delete(
+                self._base + "/labels/{}".format(item['name']))
+            if resp.status_code == 204:
+                log.resp("204: Deleted " + item['name'])
+            else:
+                log.resp("{}: {}".format(resp.status_code, resp.text))
