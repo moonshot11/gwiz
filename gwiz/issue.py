@@ -20,6 +20,14 @@ class Issue:
             "comments" : [com.as_dict() for com in self._comments]
         }
 
+    @staticmethod
+    def json_to_issues(data):
+        """Convert json to Issues"""
+        issues = []
+        for item in data:
+            issues.append(Issue(item['title'], item['desc'], item['labels']))
+        return issues
+
 
 class Comment:
     def __init__(self, author, body):

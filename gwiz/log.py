@@ -10,4 +10,4 @@ def error(msg, code=1):
     sys.exit(code)
 
 def resp(msg):
-    print("-R- " + msg)
+    print("-R- {}".format(msg))

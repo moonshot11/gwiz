@@ -58,8 +58,20 @@ class Github(session.Session):
             "description" : label.desc,
             "color" : label.color
         }
-        resp = self._session.post(self._base + "/labels", data=json.dumps(data))
-        print(resp.text)
+        resp = self._session.post(
+            self._base + "/labels", data=json.dumps(data))
+        log.resp(resp.text)
+
+    def _apply_issue(self, issue):
+        """Upload an issue to the web"""
+        data = {
+            "title" : issue._title,
+            "body" : issue._desc,
+            "labels" : issue._labels
+        }
+        resp = self._session.post(
+            self._base + "/issues", data=json.dumps(data))
+        log.resp(resp.text)
 
     def _delete_all_labels(self):
         """Delete all labels"""
