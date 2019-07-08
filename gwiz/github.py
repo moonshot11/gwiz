@@ -31,7 +31,8 @@ class Github(session.Session):
 
     def _get_issues(self, comments=True):
         """Returns issues"""
-        data = self._session.get(self._base + "/issues").json()
+        params = {"direction" : "asc"}
+        data = self._session.get(self._base + "/issues", params=params).json()
         issues = []
         for item in data:
             issue = Issue(item['title'], item['body'], item['labels'])
@@ -72,6 +73,14 @@ class Github(session.Session):
         resp = self._session.post(
             self._base + "/issues", data=json.dumps(data))
         log.resp(resp.text)
+        log.info(issue._comments)
+        iss_number = resp.json()['number']
+        for comment in issue._comments:
+            data = {"body" : comment._body}
+            resp = self._session.post(
+                self._base + "/issues/{}/comments".format(iss_number),
+                data=json.dumps(data))
+            log.resp(resp.text)
 
     def _delete_all_labels(self):
         """Delete all labels"""

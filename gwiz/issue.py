@@ -25,7 +25,10 @@ class Issue:
         """Convert json to Issues"""
         issues = []
         for item in data:
-            issues.append(Issue(item['title'], item['desc'], item['labels']))
+            issue = Issue(item['title'], item['desc'], item['labels'])
+            issues.append(issue)
+            for comment in item['comments']:
+                issue.add_comment(Comment(comment['author'], comment['body']))
         return issues
 
 
