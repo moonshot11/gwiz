@@ -1,7 +1,7 @@
 # session.py
 
 import json
-from abc import ABC, abstractmethod as absmth
+from abc import ABC, abstractmethod
 
 from gwiz.issue import Issue, Comment
 from gwiz.label import Label
@@ -41,3 +41,35 @@ class Session():
             self._delete_all_labels()
         if only is None or only == "issues":
             self._delete_all_issues()
+
+    @abstractmethod
+    def __init__(self, user, proj):
+        pass
+
+    @abstractmethod
+    def _get_labels(self):
+        pass
+
+    @abstractmethod
+    def _get_issues(self):
+        pass
+
+    @abstractmethod
+    def _get_comments(self):
+        pass
+
+    @abstractmethod
+    def _apply_label(self, label):
+        pass
+
+    @abstractmethod
+    def _apply_issue(self, issue):
+        pass
+
+    @abstractmethod
+    def _delete_all_labels(self):
+        pass
+
+    @abstractmethod
+    def _delete_all_issues(self):
+        pass
