@@ -39,3 +39,5 @@ class Session():
         """Delete all labels"""
         if only is None or only == "labels":
             self._delete_all_labels()
+        if only is None or only == "issues":
+            self._delete_all_issues()

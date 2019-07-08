@@ -87,10 +87,27 @@ class Github(session.Session):
         data = self._session.get(self._base + "/labels").json()
         if not data:
             log.info("No labels found!")
+            return
         for item in data:
             resp = self._session.delete(
                 self._base + "/labels/{}".format(item['name']))
             if resp.status_code == 204:
-                log.resp("204: Deleted " + item['name'])
+                log.resp("204: Deleted label " + item['name'])
+            else:
+                log.resp("{}: {}".format(resp.status_code, resp.text))
+
+    def _delete_all_issues(self):
+        """Delete all issues (including comments)"""
+        log.info("Github API does not currently support deleting issues. Sorry!")
+        return
+        data = self._session.get(self._base + "/issues").json()
+        if not data:
+            log.info("No issues found!")
+            return
+        for item in data:
+            resp = self._session.delete(
+                self._base + "/issues/{}".format(item['number']))
+            if resp.status_code == 204:
+                log.resp("204: Deleted issue " + item['title'])
             else:
                 log.resp("{}: {}".format(resp.status_code, resp.text))

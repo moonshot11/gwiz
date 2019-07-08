@@ -54,6 +54,6 @@ if __name__ == "__main__":
     elif args.action == "upload":
         session.apply_json(args.file, args.only)
     elif args.action == "clear":
-        choice = input("\nDelete ALL labels? Type 'delete' to confirm: ")
+        choice = input("\nDelete data? Type 'delete' below to confirm:\n")
         if choice == "delete":
             session.delete_all(args.only)
