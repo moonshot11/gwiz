@@ -35,7 +35,7 @@ class Github(session.Session):
         data = self._session.get(self._base + "/issues", params=params).json()
         issues = []
         for item in data:
-            issue = Issue(item['title'], item['body'], item['labels'])
+            issue = Issue(item['title'], item['body'], item['labels'], item['state'])
             if item['comments'] > 0:
                 issue._comments = self._get_comments(item['number'])
             issues.append(issue)
@@ -70,11 +70,20 @@ class Github(session.Session):
             "body" : issue._desc,
             "labels" : issue._labels
         }
+        state = issue._state
         resp = self._session.post(
             self._base + "/issues", data=json.dumps(data))
         log.resp(resp.text)
         log.info(issue._comments)
         iss_number = resp.json()['number']
+        # Update state
+        if state == "closed":
+            log.info("Updating state")
+            resp = self._session.patch(
+                self._base + "/issues/" + str(iss_number),
+                data=json.dumps({"state" : "closed"}))
+            log.resp(resp.text)
+        # Add comments
         for comment in issue._comments:
             data = {"body" : comment._body}
             resp = self._session.post(

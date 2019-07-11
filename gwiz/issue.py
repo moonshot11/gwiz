@@ -1,10 +1,11 @@
 # issues.py
 
 class Issue:
-    def __init__(self, title, desc, labels):
+    def __init__(self, title, desc, labels, state):
         self._title = title
         self._desc = desc
         self._labels = labels
+        self._state = state
         self._comments = list()
 
     def add_comment(self, com):
@@ -17,6 +18,7 @@ class Issue:
             "title" : self._title,
             "desc" : self._desc,
             "labels" : self._labels,
+            "state" : self._state,
             "comments" : [com.as_dict() for com in self._comments]
         }
 
@@ -25,7 +27,7 @@ class Issue:
         """Convert json to Issues"""
         issues = []
         for item in data:
-            issue = Issue(item['title'], item['desc'], item['labels'])
+            issue = Issue(item['title'], item['desc'], item['labels'], item['state'])
             issues.append(issue)
             for comment in item['comments']:
                 issue.add_comment(Comment(comment['author'], comment['body']))
