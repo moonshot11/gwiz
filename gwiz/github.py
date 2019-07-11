@@ -31,7 +31,7 @@ class Github(session.Session):
 
     def _get_issues(self, comments=True):
         """Returns issues"""
-        params = {"direction" : "asc"}
+        params = {"direction" : "asc", "state" : "all"}
         data = self._session.get(self._base + "/issues", params=params).json()
         issues = []
         for item in data:
