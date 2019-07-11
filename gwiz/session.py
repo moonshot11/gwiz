@@ -73,3 +73,8 @@ class Session():
     @abstractmethod
     def _delete_all_issues(self):
         pass
+
+    @abstractmethod
+    def _format_data(self, data):
+        """Dict -> format accepted by service"""
+        pass

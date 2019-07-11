@@ -60,7 +60,7 @@ class Github(session.Session):
             "color" : label.color
         }
         resp = self._session.post(
-            self._base + "/labels", data=json.dumps(data))
+            self._base + "/labels", data=self._format_data(data))
         log.resp(resp.text)
 
     def _apply_issue(self, issue):
@@ -72,7 +72,7 @@ class Github(session.Session):
         }
         state = issue._state
         resp = self._session.post(
-            self._base + "/issues", data=json.dumps(data))
+            self._base + "/issues", data=self._format_data(data))
         log.resp(resp.text)
         log.info(issue._comments)
         iss_number = resp.json()['number']
@@ -81,14 +81,14 @@ class Github(session.Session):
             log.info("Updating state")
             resp = self._session.patch(
                 self._base + "/issues/" + str(iss_number),
-                data=json.dumps({"state" : "closed"}))
+                data=self._format_data({"state" : "closed"}))
             log.resp(resp.text)
         # Add comments
         for comment in issue._comments:
             data = {"body" : comment._body}
             resp = self._session.post(
                 self._base + "/issues/{}/comments".format(iss_number),
-                data=json.dumps(data))
+                data=self._format_data(data))
             log.resp(resp.text)
 
     def _delete_all_labels(self):
@@ -120,3 +120,7 @@ class Github(session.Session):
                 log.resp("204: Deleted issue " + item['title'])
             else:
                 log.resp("{}: {}".format(resp.status_code, resp.text))
+
+    def _format_data(self, data):
+        """Dict -> format accepted by service"""
+        return json.dumps(data)
