@@ -81,7 +81,12 @@ class Gitlab(session.Session):
                 self._base + "/issues/{}".format(iid),
                 data=self._format_data({"state_event" : "close"}))
             log.resp(resp.text)
-        log.info("Done")
+        for comment in issue._comments:
+            data = {"body" : comment._body}
+            resp = self._session.post(
+                self._base + "/issues/{}/notes".format(iid),
+                data=self._format_data(data))
+            log.resp(resp.text)
 
     def _delete_all_labels(self):
         """Delete all labels in a Github project"""
