@@ -30,7 +30,9 @@ class Gitlab(session.Session):
         return labels
 
     def _get_issues(self):
-        data = self._session.get(self._base + "/issues").json()
+        """Get issues from Gitlab project"""
+        params = {"sort" : "asc"}
+        data = self._session.get(self._base + "/issues", params=params).json()
         issues = []
         for item in data:
             issue = Issue(item['title'], item['description'], item['labels'], item['state'])
@@ -50,17 +52,67 @@ class Gitlab(session.Session):
         return comments
 
     def _apply_label(self, label):
-        pass
+        """Upload a label to Gitlab"""
+        data = {
+            "name" : label.title,
+            "description" : label.desc,
+            "color" : "#{}".format(label.color)
+        }
+        resp = self._session.post(
+            self._base + "/labels", data=self._format_data(data))
+        log.resp(resp.text)
 
     def _apply_issue(self, issue):
-        pass
+        """Upload an issue to Gitlab"""
+        data = {
+            "title" : issue._title,
+            "description" : issue._desc,
+            "labels" : issue._labels
+        }
+        state = issue._state
+        log.info("Applying issue")
+        resp = self._session.post(
+            self._base + "/issues", data=self._format_data(data))
+        log.resp(resp.text)
+        iid = resp.json()['iid']
+        if state == "closed":
+            log.info("Updating state")
+            resp = self._session.put(
+                self._base + "/issues/{}".format(iid),
+                data=self._format_data({"state_event" : "close"}))
+            log.resp(resp.text)
+        log.info("Done")
 
     def _delete_all_labels(self):
-        pass
+        """Delete all labels in a Github project"""
+        data = self._session.get(self._base + "/labels").json()
+        if not data:
+            log.info("No labels found!")
+            return
+        for item in data:
+            info = {"name" : item['name']}
+            resp = self._session.delete(
+                self._base + "/labels",
+                data=self._format_data(info))
+            if resp.status_code == 204:
+                log.resp("204: Deleted label " + item['name'])
+            else:
+                log.resp("{}: {}".format(resp.status_code, resp.text))
 
     def _delete_all_issues(self):
-        pass
+        """Delete all issues in a Gitlab project"""
+        data = self._session.get(self._base + "/issues").json()
+        if not data:
+            log.info("No issues found!")
+            return
+        for item in data:
+            resp = self._session.delete(
+                self._base + "/issues/{}".format(item['iid']))
+            if resp.status_code == 204:
+                log.resp("204: Deleted issue " + item['title'])
+            else:
+                log.resp("{}: {}".format(resp.status_code, resp.text))
 
     def _format_data(self, data):
         """Dict -> format accepted by service"""
-        pass
+        return data
