@@ -18,29 +18,32 @@ def setup_args():
     sub_upload = subs.add_parser("upload", help="Upload data to site")
     sub_export = subs.add_parser("backup", help="Download data to local file")
     sub_clrlabels = subs.add_parser("clear", help="Clear online info")
+    sub_ratelimit = subs.add_parser("ratelimit", help="Get rate limit")
 
     for sub in (sub_upload, sub_export):
         sub.add_argument("--file", "-f", required=True)
-    for sub in (sub_upload, sub_export, sub_clrlabels):
+    for sub in (sub_upload, sub_export, sub_clrlabels, sub_ratelimit):
         sub.add_argument("--site", "-s", required=True, choices=["github", "gitlab"])
         sub.add_argument("--user", "-u", required=True)
         sub.add_argument("--proj", "-p", required=True)
+    for sub in (sub_upload, sub_export, sub_clrlabels):
         sub.add_argument("--labels-only", action="store_true")
         sub.add_argument("--issues-only", action="store_true")
 
     args = parser.parse_args()
 
-    if args.action is None:
-        log.error("Must provide action: see usage (-h)")
-    if args.labels_only and args.issues_only:
-        log.error("Can only provide one of --labels-only and --issues-only")
+    if hasattr(args, "labels_only"):
+        if args.action is None:
+            log.error("Must provide action: see usage (-h)")
+        if args.labels_only and args.issues_only:
+            log.error("Can only provide one of --labels-only and --issues-only")
 
-    if args.labels_only:
-        args.only = "labels"
-    elif args.issues_only:
-        args.only = "issues"
-    else:
-        args.only = None
+        if args.labels_only:
+            args.only = "labels"
+        elif args.issues_only:
+            args.only = "issues"
+        else:
+            args.only = None
 
     return args
 
@@ -57,3 +60,5 @@ if __name__ == "__main__":
         choice = input("\nDelete data? Type 'delete' below to confirm:\n")
         if choice == "delete":
             session.delete_all(args.only)
+    elif args.action == "ratelimit":
+        session.get_rate_limit()

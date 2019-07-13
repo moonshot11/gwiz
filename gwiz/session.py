@@ -63,6 +63,15 @@ class Session():
         return result
 
     @abstractmethod
+    def get_rate_limit(self):
+        pass
+
+    @property
+    @abstractmethod
+    def API_ROOT(self):
+        pass
+
+    @abstractmethod
     def __init__(self, user, proj):
         pass
 

@@ -17,8 +17,7 @@ class Gitlab(session.Session):
         self._session = requests.Session()
         self._session.headers.update(auth_hdr)
         # Get project ID
-        BASE = "https://gitlab.com/api/v4"
-        projects = self._get("/users/{}/projects".format(user), base=BASE)
+        projects = self._get("/users/{}/projects".format(user), base=self.API_ROOT)
         for item in projects:
             if item['name'] == proj:
                 proj_id = item['id']
@@ -26,7 +25,15 @@ class Gitlab(session.Session):
                 break
         else:
             log.error("Couldn't find project: " + proj)
-        self._base = BASE + "/projects/{}".format(proj_id)
+        self._base = self.API_ROOT + "/projects/{}".format(proj_id)
+
+    def get_rate_limit(self):
+        """Gitlab rate limit"""
+        log.error("Gitlab does not currently support rate limit reporting")
+
+    @property
+    def API_ROOT(self):
+        return "https://gitlab.com/api/v4"
 
     def _get_labels(self):
         """Return labels"""

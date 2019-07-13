@@ -16,7 +16,16 @@ class Github(session.Session):
         auth_hdr = {"Authorization" : "token " + input("Enter PA token: ")}
         self._session = requests.Session()
         self._session.headers.update(auth_hdr)
-        self._base = "https://api.github.com/repos/{}/{}".format(user, proj)
+        self._base = self.API_ROOT + "/repos/{}/{}".format(user, proj)
+
+    @property
+    def API_ROOT(self):
+        return "https://api.github.com"
+
+    def get_rate_limit(self):
+        """Get the rate limit"""
+        resp = self._session.get(self.API_ROOT + "/rate_limit")
+        print(resp.text)
 
     def _get_labels(self):
         """Return labels"""
