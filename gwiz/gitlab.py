@@ -53,7 +53,10 @@ class Gitlab(session.Session):
         return issues
 
     def _get_comments(self, issue_id):
-        data = self._session.get(self._base + "/issues/{}/notes".format(issue_id))
+        params = {"sort" : "asc"}
+        data = self._session.get(
+            self._base + "/issues/{}/notes".format(issue_id),
+            params=params)
         data = data.json()
         comments = []
         for item in data:
