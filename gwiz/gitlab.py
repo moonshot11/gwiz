@@ -18,8 +18,7 @@ class Gitlab(session.Session):
         self._session.headers.update(auth_hdr)
         # Get project ID
         BASE = "https://gitlab.com/api/v4"
-        resp = self._session.get(BASE + "/users/{}/projects".format(user))
-        projects = resp.json()
+        projects = self._get("/users/{}/projects".format(user), base=BASE)
         for item in projects:
             if item['name'] == proj:
                 proj_id = item['id']
@@ -31,7 +30,7 @@ class Gitlab(session.Session):
 
     def _get_labels(self):
         """Return labels"""
-        data = self._session.get(self._base + "/labels").json()
+        data = self._get("/labels")
         labels = []
         for lbl in data:
             labels.append(
@@ -43,7 +42,7 @@ class Gitlab(session.Session):
     def _get_issues(self):
         """Get issues from Gitlab project"""
         params = {"sort" : "asc"}
-        data = self._session.get(self._base + "/issues", params=params).json()
+        data = self._get("/issues", params=params)
         issues = []
         for item in data:
             issue = Issue(item['title'], item['description'], item['labels'], item['state'])
@@ -54,10 +53,9 @@ class Gitlab(session.Session):
 
     def _get_comments(self, issue_id):
         params = {"sort" : "asc"}
-        data = self._session.get(
-            self._base + "/issues/{}/notes".format(issue_id),
+        data = self._get(
+            "/issues/{}/notes".format(issue_id),
             params=params)
-        data = data.json()
         comments = []
         for item in data:
             comments.append(
@@ -104,7 +102,7 @@ class Gitlab(session.Session):
 
     def _delete_all_labels(self):
         """Delete all labels in a Github project"""
-        data = self._session.get(self._base + "/labels").json()
+        data = self._get("/labels")
         if not data:
             log.info("No labels found!")
             return
@@ -120,7 +118,7 @@ class Gitlab(session.Session):
 
     def _delete_all_issues(self):
         """Delete all issues in a Gitlab project"""
-        data = self._session.get(self._base + "/issues").json()
+        data = self._get("/issues")
         if not data:
             log.info("No issues found!")
             return

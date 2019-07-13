@@ -42,6 +42,26 @@ class Session():
         if only is None or only == "issues":
             self._delete_all_issues()
 
+    def _get(self, url, base=None, params=None):
+        """Submit a GET request, and return the JSON response"""
+        result = []
+        base = base or self._base
+        params = params.copy() if params else dict()
+
+        # Initialize pagination
+        params['per_page'] = 20
+        params['page'] = 1
+
+        while True:
+            resp = self._session.get(base + url, params=params)
+            result +=  resp.json()
+            if "next" in resp.links:
+                params['page'] += 1
+            else:
+                break
+
+        return result
+
     @abstractmethod
     def __init__(self, user, proj):
         pass

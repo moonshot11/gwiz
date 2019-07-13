@@ -21,7 +21,7 @@ class Github(session.Session):
     def _get_labels(self):
         """Return labels"""
         # Returns list of labels in json
-        data = self._session.get(self._base + "/labels").json()
+        data = self._get("/labels")
         labels = []
         for lbl in data:
             labels.append(
@@ -32,7 +32,7 @@ class Github(session.Session):
     def _get_issues(self, comments=True):
         """Returns issues"""
         params = {"direction" : "asc", "state" : "all"}
-        data = self._session.get(self._base + "/issues", params=params).json()
+        data = self._get("/issues", params=params)
         issues = []
         for item in data:
             labels = [lbl['name'] for lbl in item['labels']]
@@ -44,8 +44,7 @@ class Github(session.Session):
 
     def _get_comments(self, issue_id):
         """Returns comments from issue"""
-        data = self._session.get(self._base + "/issues/{}/comments".format(issue_id))
-        data = data.json()
+        data = self._get("/issues/{}/comments".format(issue_id))
         comments = []
         for item in data:
             comments.append(
@@ -94,7 +93,7 @@ class Github(session.Session):
 
     def _delete_all_labels(self):
         """Delete all labels"""
-        data = self._session.get(self._base + "/labels").json()
+        data = self._get("/labels")
         if not data:
             log.info("No labels found!")
             return
@@ -110,7 +109,7 @@ class Github(session.Session):
         """Delete all issues (including comments)"""
         log.info("Github API does not currently support deleting issues. Sorry!")
         return
-        data = self._session.get(self._base + "/issues").json()
+        data = self._get("/issues")
         if not data:
             log.info("No issues found!")
             return
