@@ -25,7 +25,7 @@ class Github(session.Session):
     def get_rate_limit(self):
         """Get the rate limit"""
         resp = self._session.get(self.API_ROOT + "/rate_limit")
-        print(resp.text)
+        log.info(resp.text)
 
     def _get_labels(self):
         """Return labels"""
@@ -68,9 +68,10 @@ class Github(session.Session):
             "description" : label.desc,
             "color" : label.color
         }
+        log.info('Posting label "{}"...'.format(label.title), end='')
         resp = self._post(
             self._base + "/labels", data=self._format_data(data))
-        log.resp(resp.text)
+        print("done!")
 
     def _apply_issue(self, issue):
         """Upload an issue to the web"""
@@ -80,24 +81,25 @@ class Github(session.Session):
             "labels" : issue._labels
         }
         state = issue._state
+        log.info('Posting issue "{}"...'.format(issue._title), end='')
         resp = self._post(
             self._base + "/issues", data=self._format_data(data))
-        log.resp(resp.text)
         iss_number = resp.json()['number']
         # Update state
         if state == "closed":
-            log.info("Updating state")
+            print("closing...", end='', flush=True)
             resp = self._patch(
                 self._base + "/issues/" + str(iss_number),
                 data=self._format_data({"state" : "closed"}))
-            log.resp(resp.text)
+        print("done!")
         # Add comments
         for comment in issue._comments:
             data = {"body" : comment._body}
+            log.info("    Adding comment to issue #{}...".format(iss_number), end='')
             resp = self._post(
                 self._base + "/issues/{}/comments".format(iss_number),
                 data=self._format_data(data))
-            log.resp(resp.text)
+            print("done!")
 
     def _delete_all_labels(self):
         """Delete all labels"""

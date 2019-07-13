@@ -35,7 +35,6 @@ class Session():
         if only is None or only == "labels":
             for label in Label.json_to_labels(data["labels"]):
                 self._apply_label(label)
-                time.sleep(self.DELAY)
         if only is None or only == "issues":
             for issue in Issue.json_to_issues(data["issues"]):
                 self._apply_issue(issue)

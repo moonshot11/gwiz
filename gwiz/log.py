@@ -2,8 +2,8 @@
 
 import sys
 
-def info(msg):
-    print("-I- {}".format(msg))
+def info(msg, **kwargs):
+    print("-I- {}".format(msg), flush=True, **kwargs)
 
 def error(msg, code=1):
     print("-E- {}".format(msg))
