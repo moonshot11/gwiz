@@ -77,7 +77,7 @@ class Gitlab(session.Session):
             "description" : label.desc,
             "color" : "#{}".format(label.color)
         }
-        resp = self._session.post(
+        resp = self._post(
             self._base + "/labels", data=self._format_data(data))
         log.resp(resp.text)
 
@@ -90,19 +90,19 @@ class Gitlab(session.Session):
         }
         state = issue._state
         log.info("Applying issue")
-        resp = self._session.post(
+        resp = self._post(
             self._base + "/issues", data=self._format_data(data))
         log.resp(resp.text)
         iid = resp.json()['iid']
         if state == "closed":
             log.info("Updating state")
-            resp = self._session.put(
+            resp = self._put(
                 self._base + "/issues/{}".format(iid),
                 data=self._format_data({"state_event" : "close"}))
             log.resp(resp.text)
         for comment in issue._comments:
             data = {"body" : comment._body}
-            resp = self._session.post(
+            resp = self._post(
                 self._base + "/issues/{}/notes".format(iid),
                 data=self._format_data(data))
             log.resp(resp.text)
@@ -115,7 +115,7 @@ class Gitlab(session.Session):
             return
         for item in data:
             info = {"name" : item['name']}
-            resp = self._session.delete(
+            resp = self._delete(
                 self._base + "/labels",
                 data=self._format_data(info))
             if resp.status_code == 204:
@@ -130,7 +130,7 @@ class Gitlab(session.Session):
             log.info("No issues found!")
             return
         for item in data:
-            resp = self._session.delete(
+            resp = self._delete(
                 self._base + "/issues/{}".format(item['iid']))
             if resp.status_code == 204:
                 log.resp("204: Deleted issue " + item['title'])
