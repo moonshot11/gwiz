@@ -68,7 +68,7 @@ class Github(session.Session):
             "description" : label.desc,
             "color" : label.color
         }
-        resp = self._session.post(
+        resp = self._post(
             self._base + "/labels", data=self._format_data(data))
         log.resp(resp.text)
 
@@ -80,22 +80,21 @@ class Github(session.Session):
             "labels" : issue._labels
         }
         state = issue._state
-        resp = self._session.post(
+        resp = self._post(
             self._base + "/issues", data=self._format_data(data))
         log.resp(resp.text)
-        log.info(issue._comments)
         iss_number = resp.json()['number']
         # Update state
         if state == "closed":
             log.info("Updating state")
-            resp = self._session.patch(
+            resp = self._patch(
                 self._base + "/issues/" + str(iss_number),
                 data=self._format_data({"state" : "closed"}))
             log.resp(resp.text)
         # Add comments
         for comment in issue._comments:
             data = {"body" : comment._body}
-            resp = self._session.post(
+            resp = self._post(
                 self._base + "/issues/{}/comments".format(iss_number),
                 data=self._format_data(data))
             log.resp(resp.text)
@@ -107,7 +106,7 @@ class Github(session.Session):
             log.info("No labels found!")
             return
         for item in data:
-            resp = self._session.delete(
+            resp = self._delete(
                 self._base + "/labels/{}".format(item['name']))
             if resp.status_code == 204:
                 log.resp("204: Deleted label " + item['name'])
@@ -123,7 +122,7 @@ class Github(session.Session):
             log.info("No issues found!")
             return
         for item in data:
-            resp = self._session.delete(
+            resp = self._delete(
                 self._base + "/issues/{}".format(item['number']))
             if resp.status_code == 204:
                 log.resp("204: Deleted issue " + item['title'])

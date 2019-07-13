@@ -1,6 +1,7 @@
 # session.py
 
 import json
+import time
 from abc import ABC, abstractmethod
 
 from gwiz.issue import Issue, Comment
@@ -9,6 +10,9 @@ from gwiz.label import Label
 # TODO: Make this class abstract once interface is defined
 class Session():
     """A generic web session"""
+
+    # In seconds, after each post request
+    DELAY = 1
 
     def write_json(self, filename, only=None):
         """Write labels to filename"""
@@ -31,6 +35,7 @@ class Session():
         if only is None or only == "labels":
             for label in Label.json_to_labels(data["labels"]):
                 self._apply_label(label)
+                time.sleep(self.DELAY)
         if only is None or only == "issues":
             for issue in Issue.json_to_issues(data["issues"]):
                 self._apply_issue(issue)
@@ -61,6 +66,24 @@ class Session():
                 break
 
         return result
+
+    def _post(self, *args, **kwargs):
+        return self._update_wrapper(self._session.post, *args, **kwargs)
+
+    def _patch(self, *args, **kwargs):
+        return self._update_wrapper(self._session.patch, *args, **kwargs)
+
+    def _delete(self, *args, **kwargs):
+        return self._update_wrapper(self._session.delete, *args, **kwargs)
+
+    def _put(self, *args, **kwargs):
+        return self._update_wrapper(self._session.put, *args, **kwargs)
+
+    def _update_wrapper(self, func, *args, **kwargs):
+        """Delay for POST, PATCH, PUT, and DELETE"""
+        time.sleep(self.DELAY)
+        resp = func(*args, **kwargs)
+        return resp
 
     @abstractmethod
     def get_rate_limit(self):
