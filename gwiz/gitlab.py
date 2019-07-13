@@ -78,7 +78,7 @@ class Gitlab(session.Session):
         data = {
             "title" : issue._title,
             "description" : issue._desc,
-            "labels" : issue._labels
+            "labels" : ",".join(issue._labels)
         }
         state = issue._state
         log.info("Applying issue")
