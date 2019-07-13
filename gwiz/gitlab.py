@@ -16,7 +16,18 @@ class Gitlab(session.Session):
         auth_hdr = {"Private-Token" : input("Enter PA token: ")}
         self._session = requests.Session()
         self._session.headers.update(auth_hdr)
-        self._base = "https://gitlab.com/api/v4/projects/{}".format(proj)
+        # Get project ID
+        BASE = "https://gitlab.com/api/v4"
+        resp = self._session.get(BASE + "/users/{}/projects".format(user))
+        projects = resp.json()
+        for item in projects:
+            if item['name'] == proj:
+                proj_id = item['id']
+                log.info("Found project {}, id is {}".format(proj, proj_id))
+                break
+        else:
+            log.error("Couldn't find project: " + proj)
+        self._base = BASE + "/projects/{}".format(proj_id)
 
     def _get_labels(self):
         """Return labels"""
