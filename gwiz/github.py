@@ -35,7 +35,8 @@ class Github(session.Session):
         data = self._session.get(self._base + "/issues", params=params).json()
         issues = []
         for item in data:
-            issue = Issue(item['title'], item['body'], item['labels'], item['state'])
+            labels = [lbl['name'] for lbl in item['labels']]
+            issue = Issue(item['title'], item['body'], labels, item['state'])
             if item['comments'] > 0:
                 issue._comments = self._get_comments(item['number'])
             issues.append(issue)
