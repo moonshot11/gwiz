@@ -68,10 +68,8 @@ class Github(session.Session):
             "description" : label.desc,
             "color" : label.color
         }
-        log.info('Posting label "{}"...'.format(label.title), end='')
         resp = self._post(
             self._base + "/labels", data=self._format_data(data))
-        print("done!")
 
     def _apply_issue(self, issue):
         """Upload an issue to the web"""
@@ -81,7 +79,6 @@ class Github(session.Session):
             "labels" : issue._labels
         }
         state = issue._state
-        log.info('Posting issue "{}"...'.format(issue._title), end='')
         resp = self._post(
             self._base + "/issues", data=self._format_data(data))
         iss_number = resp.json()['number']
@@ -91,15 +88,15 @@ class Github(session.Session):
             resp = self._patch(
                 self._base + "/issues/" + str(iss_number),
                 data=self._format_data({"state" : "closed"}))
-        print("done!")
-        # Add comments
-        for comment in issue._comments:
-            data = {"body" : comment._body}
-            log.info("    Adding comment to issue #{}...".format(iss_number), end='')
-            resp = self._post(
-                self._base + "/issues/{}/comments".format(iss_number),
-                data=self._format_data(data))
-            print("done!")
+
+        return iss_number
+
+    def _apply_comment(self, iid, comment):
+        """Apply comment to issue #iid"""
+        data = {"body" : comment._body}
+        resp = self._post(
+            self._base + "/issues/{}/comments".format(iid),
+            data=self._format_data(data))
 
     def _delete_all_labels(self):
         """Delete all labels"""

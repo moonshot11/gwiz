@@ -77,10 +77,8 @@ class Gitlab(session.Session):
             "description" : label.desc,
             "color" : "#{}".format(label.color)
         }
-        log.info('Posting label "{}"...'.format(label.title), end='')
         resp = self._post(
             self._base + "/labels", data=self._format_data(data))
-        print("done!")
 
     def _apply_issue(self, issue):
         """Upload an issue to Gitlab"""
@@ -90,7 +88,6 @@ class Gitlab(session.Session):
             "labels" : ",".join(issue._labels)
         }
         state = issue._state
-        log.info('Posting issue "{}"...'.format(issue._title), end='')
         resp = self._post(
             self._base + "/issues", data=self._format_data(data))
         iid = resp.json()['iid']
@@ -99,14 +96,14 @@ class Gitlab(session.Session):
             resp = self._put(
                 self._base + "/issues/{}".format(iid),
                 data=self._format_data({"state_event" : "close"}))
-        print("done!")
-        for comment in issue._comments:
-            data = {"body" : comment._body}
-            log.info("    Adding comment to issue #{}...".format(iid), end='')
-            resp = self._post(
-                self._base + "/issues/{}/notes".format(iid),
-                data=self._format_data(data))
-            print("done!")
+        return iid
+
+    def _apply_comment(self, iid, comment):
+        """Post comment to Gitlab issue"""
+        data = {"body" : comment._body}
+        resp = self._post(
+            self._base + "/issues/{}/notes".format(iid),
+            data=self._format_data(data))
 
     def _delete_all_labels(self):
         """Delete all labels in a Github project"""

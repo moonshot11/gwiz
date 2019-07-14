@@ -4,6 +4,7 @@ import json
 import time
 from abc import ABC, abstractmethod
 
+from gwiz import log
 from gwiz.issue import Issue, Comment
 from gwiz.label import Label
 
@@ -33,11 +34,30 @@ class Session():
             data = json.load(fin)
 
         if only is None or only == "labels":
-            for label in Label.json_to_labels(data["labels"]):
+            # Apply labels
+            labels = Label.json_to_labels(data["labels"])
+            for i, label in enumerate(labels):
+                log.info('Posting label ({}/{}) "{}"...'.format(
+                    i+1, len(labels), label.title), end='')
                 self._apply_label(label)
+                print("done!")
+
         if only is None or only == "issues":
-            for issue in Issue.json_to_issues(data["issues"]):
-                self._apply_issue(issue)
+            # Apply issues
+            issues = Issue.json_to_issues(data["issues"])
+            for i, issue in enumerate(issues):
+                log.info('Posting issue ({}/{}) "{}"...'.format(
+                    i+1, len(issues), issue._title), end='')
+                iid = self._apply_issue(issue)
+                print("done!")
+
+                # Apply comments
+                for j, comment in enumerate(issue._comments):
+                    log.info('  Posting comment ({}/{}) to issue #{}...'.format(
+                        j+1, len(issue._comments), iid), end='')
+                    self._apply_comment(iid, comment)
+                    print("done!")
+
 
     def delete_all(self, only):
         """Delete all labels"""
@@ -115,6 +135,10 @@ class Session():
 
     @abstractmethod
     def _apply_issue(self, issue):
+        pass
+
+    @abstractmethod
+    def _apply_comment(self, iid, comment):
         pass
 
     @abstractmethod
